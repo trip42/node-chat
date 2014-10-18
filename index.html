@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: arial;
+            color: #333;
+            font-size: 20px;
+        }
+
+        #messages {
+            position: absolute;
+            overflow: scroll;
+            border: 1px solid #ccc;
+            top: 10px;
+            right: 10px;
+            bottom: 50px;
+            left: 10px;
+        }
+
+        #message-form {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+        }
+
+        #message {
+            font-size: 20px;
+            width: 100%;
+            padding: 5px;
+        }
+
+        .message {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="messages"></div>
+    <form id="message-form">
+        <input type="text" id="message" />
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        (function() {
+            var socket = io.connect( window.location.href ); 
+            var messages = document.getElementById( 'messages' );
+            var messageForm = document.getElementById( 'message-form' );
+            var messageInput = document.getElementById( 'message' );
+
+            // when the user clicks submit (or enter) in the text field
+            // send a "message" event to the server
+            messageForm.addEventListener( 'submit', function( event ) {
+                socket.emit( 'message', messageInput.value );
+                messageInput.value = '';
+                event.preventDefault();
+            } );
+
+            // when we receive the message event from the server
+            // add it to the messages box.
+            socket.on( 'message', function( message ) {
+                var messageDiv = document.createElement( 'div' );
+                messageDiv.className = 'message';
+                messageDiv.innerText = message;
+                messages.appendChild( messageDiv );
+                // scroll to the bottom of the chat window
+                messages.scrollTop = messages.scrollHeight;
+            });
+        })();
+    </script>
+
+</body>
+</html>
